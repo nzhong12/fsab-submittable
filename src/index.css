@@ -20,15 +20,16 @@ body {
 .App {
   color: var(--dark);
   text-align: center;
-  padding-top: 4rem;
+  padding-top: 2rem;
 }
 
 h1 {
   font-size: 2.5rem;
   text-transform: uppercase;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 0px;
   font-family: garamond;
+  color: black;
 }
 
 .colleges {
@@ -40,10 +41,12 @@ h1 {
 }
 
 .college-image {
-  width: 100%;
+  width: 20%;
   height: auto;
   border-radius: 8px;
   margin-bottom: 15px;
+  align-items: center;
+  justify-content: center;
 }
 
 .recipe {

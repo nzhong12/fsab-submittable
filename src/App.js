@@ -1,19 +1,23 @@
 import { db } from "./firebase.config";
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, addDoc, deleteDoc } from "firebase/firestore";
-import './App.css'
-import myImage from '../Brown.jpg'; // Adjust path according to your directory structure
+import { collection, onSnapshot, doc, addDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import './App.css';
+import './index.css';
+import myImage from './Brown.jpg';
 
 function App() {
   const [colleges, setColleges] = useState([]);
   const [form, setForm] = useState({
     collegeName: "",
     major: "",
+    rank: "", 
     reasonsToGo: [],
-    studentsKnown: []
+    essay: ""
   });
 
   const [popupActive, setPopupActive] = useState(false);
+  const [editMode, setEditMode] = useState(false); 
+  const [currentCollegeId, setCurrentCollegeId] = useState(null); 
 
   const collegesCollectionRef = collection(db, "colleges");
 
@@ -41,48 +45,46 @@ function App() {
     setColleges(collegesClone);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
       !form.collegeName ||
-      !form.major
+      !form.major ||
+      !form.rank 
     ) {
-      alert("Please fill out at least college name and major");
+      alert("Please fill out at least college name, major, and your ranking of the school");
       return;
     }
 
-    addDoc(collegesCollectionRef, form);
+    if (editMode && currentCollegeId) {
+      // update existing college
+      await updateDoc(doc(db, "colleges", currentCollegeId), form);
+    } else {
+      // new college
+      await addDoc(collegesCollectionRef, form);
+    }
 
+    // reset form
     setForm({
       collegeName: "",
       major: "",
+      rank: "", 
       reasonsToGo: [],
-      studentsKnown: []
+      essay: ""
     });
 
     setPopupActive(false);
+    setEditMode(false); // reset edit mode
+    setCurrentCollegeId(null); 
   };
 
   const handleReasonsToGo = (e, i) => {
     const reasonsClone = [...form.reasonsToGo];
-
     reasonsClone[i] = e.target.value;
-
     setForm({
       ...form,
       reasonsToGo: reasonsClone
-    });
-  };
-
-  const handleStudentsKnown = (e, i) => {
-    const studentsClone = [...form.studentsKnown];
-
-    studentsClone[i] = e.target.value;
-
-    setForm({
-      ...form,
-      studentsKnown: studentsClone
     });
   };
 
@@ -93,32 +95,42 @@ function App() {
     });
   };
 
-  const handleStudentsKnownCount = () => {
-    setForm({
-      ...form,
-      studentsKnown: [...form.studentsKnown, ""]
-    });
-  };
-
   const removeCollege = id => {
     deleteDoc(doc(db, "colleges", id));
   };
 
+  const editCollege = college => {
+    setForm({
+      collegeName: college.collegeName,
+      major: college.major,
+      rank: college.rank, 
+      reasonsToGo: college.reasonsToGo,
+      essay: college.essay || "" // essay might not exist
+    });
+    setCurrentCollegeId(college.id);
+    setEditMode(true);
+    setPopupActive(true);
+  };
+
+  // sort colleges by user rank
+  const sortedColleges = [...colleges].sort((a, b) => {
+    return a.rank - b.rank;
+  });
+
   return (
     <div className="App">
       <h1>College Candidates List</h1>
-      <img src={myImage} alt="Description of Image" className="my-image" />
-      <button className="special" onClick={() => setPopupActive(!popupActive)}>
-  Add College
-</button>
-
+      <div className="header-container">
+        <img src={myImage} alt="Description of Image" className="college-image" />
+        <button className="special" onClick={() => setPopupActive(!popupActive)}>Add College</button>
+      </div>
 
       <div className="colleges">
-        {colleges.map((college) => (
+        {sortedColleges.map((college) => (
           <div className="college" key={college.id}>
             <h3>{college.collegeName}</h3>
-
-            <p dangerouslySetInnerHTML={{ __html: college.major }}></p>
+            <p><strong>Major:</strong> {college.major}</p>
+            <p><strong>Your Ranking:</strong> {college.rank}</p>
 
             {college.viewing && (
               <div>
@@ -129,12 +141,8 @@ function App() {
                   ))}
                 </ul>
 
-                <h4>Students Known</h4>
-                <ol>
-                  {college.studentsKnown.map((student, i) => (
-                    <li key={i}>{student}</li>
-                  ))}
-                </ol>
+                <h4>Why Us Essay</h4>
+                <p>{college.essay}</p>
               </div>
             )}
 
@@ -145,6 +153,9 @@ function App() {
               <button className="remove" onClick={() => removeCollege(college.id)}>
                 Remove
               </button>
+              <button className="edit" onClick={() => editCollege(college)}>
+                Edit
+              </button>
             </div>
           </div>
         ))}
@@ -153,10 +164,9 @@ function App() {
       {popupActive && (
         <div className="popup">
           <div className="popup-inner">
-            <h2>Add a new college</h2>
+            <h2>{editMode ? "Edit College" : "Add a new college"}</h2>
 
             <form onSubmit={handleSubmit}>
-
               <div className="form-group">
                 <label>College Name</label>
                 <input
@@ -171,6 +181,15 @@ function App() {
                 <textarea
                   value={form.major}
                   onChange={e => setForm({ ...form, major: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Your Ranking</label>
+                <input
+                  type="number"
+                  value={form.rank}
+                  onChange={e => setForm({ ...form, rank: e.target.value })}
                 />
               </div>
 
@@ -190,27 +209,19 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label>Students Known</label>
-                {form.studentsKnown.map((student, i) => (
-                  <textarea
-                    type="text"
-                    key={i}
-                    value={student}
-                    onChange={e => handleStudentsKnown(e, i)}
-                  />
-                ))}
-                <button type="button" onClick={handleStudentsKnownCount}>
-                  Add Student
-                </button>
+                <label> Why Us Essay</label>
+                <textarea
+                  value={form.essay}
+                  onChange={e => setForm({ ...form, essay: e.target.value })}
+                />
               </div>
 
               <div className="buttons">
-                <button type="submit">Submit</button>
+                <button type="submit">{editMode ? "Update" : "Submit"}</button>
                 <button type="button" className="remove" onClick={() => setPopupActive(false)}>
                   Close
                 </button>
               </div>
-
             </form>
           </div>
         </div>
