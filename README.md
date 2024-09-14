@@ -1,5 +1,5 @@
 # FSAB Final Deliverable with React, Express, and Firebase. 
-# This project is an editable college candidates list website built with React, Express, and Firebase. Users can manage their college options by adding, updating, and removing entries. The website supports editing key details for each college, including name, major, user ranking, and essay. Additionally, colleges are automatically sorted by the user ranking. 
+This project is an editable college candidates list website built with React, Express, and Firebase. Users can manage their college options by adding, updating, and removing entries. The website supports editing key details for each college, including name, major, user ranking, and essay. Additionally, colleges are automatically sorted by the user ranking. 
 
 To get started, ensure you have the necessary dependencies installed, including Firebase and React.
 
