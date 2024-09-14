@@ -10,18 +10,27 @@ body {
 .App {
   max-width: 1400px; 
   margin: 0 auto;
-  padding: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center; 
 }
 
 h1 {
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  margin-bottom: 1.75rem; 
+  margin-top: 0.5rem; 
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  color: black;
+}
+
+h2 {
   font-size: 2.5rem;
   text-transform: uppercase;
-  margin-bottom: 1.5rem; /* Reduce space below the heading */
-  margin-top: 0; /* Remove top margin */
-  font-family: garamond;
+  margin-bottom: 4rem;
+  margin-top: 0.5rem; 
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   color: black;
 }
 
@@ -29,7 +38,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: px;
 }
 
 .college-image {
@@ -56,6 +65,7 @@ h1 {
   gap: 10px; 
   margin-top: 10px;
   align-items: flex-start; 
+  color: purple;
 }
 
 .buttons button {
@@ -82,6 +92,17 @@ h1 {
   background-color: #c82333;
 }
 
+.buttons button.submitButton {
+  background-color: #28a745; /* Green color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px; /* Adjust font size as needed */
+  transition: background-color 0.3s ease;
+}
+
 button:hover {
   background-color: #0056b3;
 }
@@ -92,6 +113,18 @@ button.remove {
 
 button.remove:hover {
   background-color: #c82333;
+}
+
+button.add-reason {
+  background-color: #007bff; /* Blue color, you can change this to your desired color */
+  color: white;
+  border: none;
+  margin-top: 0;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 10px;
+  transition: background-color 0.3s ease;
 }
 
 .colleges {
@@ -114,11 +147,11 @@ button.remove:hover {
 
 .college h3 {
   margin-top: 0;
-  margin-bottom: 1rem; /* Add margin below the college name */
+  margin-bottom: 1rem; 
 }
 
 .college p {
-  margin: 10px 0;
+  margin: 5px 0;
   color: #555;
 }
 
@@ -156,7 +189,7 @@ button.remove:hover {
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   font-weight: bold;
 }
 

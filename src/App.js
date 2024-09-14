@@ -148,13 +148,13 @@ function App() {
 
             <div className="buttons">
               <button onClick={() => handleView(college.id)}>
-                View {college.viewing ? 'less' : 'info'}
+                View {college.viewing ? 'less' : 'Entry'}
               </button>
               <button className="remove" onClick={() => removeCollege(college.id)}>
-                Remove
+                Remove Entry
               </button>
               <button className="edit" onClick={() => editCollege(college)}>
-                Edit
+                Update Entry
               </button>
             </div>
           </div>
@@ -203,7 +203,7 @@ function App() {
                     onChange={e => handleReasonsToGo(e, i)}
                   />
                 ))}
-                <button type="button" onClick={handleReasonsToGoCount}>
+                <button type="button" className = "add-reason" onClick={handleReasonsToGoCount}>
                   Add Reason
                 </button>
               </div>
@@ -217,7 +217,7 @@ function App() {
               </div>
 
               <div className="buttons">
-                <button type="submit">{editMode ? "Update" : "Submit"}</button>
+              <button type="submit" className="submitButton">{editMode ? "Update" : "Submit"}</button>
                 <button type="button" className="remove" onClick={() => setPopupActive(false)}>
                   Close
                 </button>

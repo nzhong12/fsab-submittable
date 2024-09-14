@@ -27,7 +27,7 @@ h1 {
   font-size: 2.5rem;
   text-transform: uppercase;
   margin-bottom: 2rem;
-  margin-top: 0px;
+  margin-top: 100px;
   font-family: garamond;
   color: black;
 }
@@ -126,7 +126,7 @@ li {
 }
 
 .popup h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group {
