@@ -214,3 +214,7 @@ button.add-reason {
 .buttons button {
   margin-left: 10px;
 }
+
+.search-filter {
+  margin-top: 10px; /* Space between button and search filters */
+}

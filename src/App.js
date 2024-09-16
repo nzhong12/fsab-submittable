@@ -6,8 +6,11 @@ import './index.css';
 import myImage from './Brown.jpg';
 
 function App() {
-  const [colleges, setColleges] = useState([]);
-  const [form, setForm] = useState({
+  const [colleges, setColleges] = useState([]); // full college list with states
+  const [filteredColleges, setFilteredColleges] = useState([]);
+  const [searchCollegeName, setSearchCollegeName] = useState("");
+  const [searchMajor, setSearchMajor] = useState("");
+  const [form, setForm] = useState({ // database info
     collegeName: "",
     major: "",
     rank: "", 
@@ -15,21 +18,45 @@ function App() {
     essay: ""
   });
 
-  const [popupActive, setPopupActive] = useState(false);
+  const [popupActive, setPopupActive] = useState(false); // main page first, not popup
   const [editMode, setEditMode] = useState(false); 
   const [currentCollegeId, setCurrentCollegeId] = useState(null); 
 
   const collegesCollectionRef = collection(db, "colleges");
 
-  useEffect(() => {
-    onSnapshot(collegesCollectionRef, snapshot => {
-      setColleges(snapshot.docs.map(doc => ({
+  useEffect(() => { // real-time data updating
+    const unsubscribe = onSnapshot(collegesCollectionRef, snapshot => {
+      const collegeData = snapshot.docs.map(doc => ({
         id: doc.id,
         viewing: false,
         ...doc.data()
-      })));
+      }));
+      setColleges(collegeData); // 
+      setFilteredColleges(collegeData); // filtered colleges same data at first
     });
+
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => { // apply search filter
+    const lowercasedCollegeNameQuery = searchCollegeName.toLowerCase();
+    const lowercasedMajorQuery = searchMajor.toLowerCase();
+    
+    const filtered = colleges.filter(college =>
+      college.collegeName.toLowerCase().includes(lowercasedCollegeNameQuery) &&
+      college.major.toLowerCase().includes(lowercasedMajorQuery) 
+    );
+    
+    setFilteredColleges(filtered);
+  }, [searchCollegeName, searchMajor, colleges]);
+
+  const handleSearchCollegeNameChange = (e) => {
+    setSearchCollegeName(e.target.value);
+  };
+
+  const handleSearchMajorChange = (e) => { // update search input
+    setSearchMajor(e.target.value);
+  };
 
   const handleView = id => {
     const collegesClone = [...colleges];
@@ -42,12 +69,11 @@ function App() {
       }
     });
 
-    setColleges(collegesClone);
+    setColleges(collegesClone); // newly filtered colleges
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (
       !form.collegeName ||
       !form.major ||
@@ -81,7 +107,7 @@ function App() {
 
   const handleReasonsToGo = (e, i) => {
     const reasonsClone = [...form.reasonsToGo];
-    reasonsClone[i] = e.target.value;
+    reasonsClone[i] = e.target.value; // update corresponding reason in the clone
     setForm({
       ...form,
       reasonsToGo: reasonsClone
@@ -113,17 +139,37 @@ function App() {
   };
 
   // sort colleges by user rank
-  const sortedColleges = [...colleges].sort((a, b) => {
+  const sortedColleges = [...filteredColleges].sort((a, b) => {
     return a.rank - b.rank;
   });
 
   return (
     <div className="App">
-      <h1>College Candidates List</h1>
-      <div className="header-container">
-        <img src={myImage} alt="Description of Image" className="college-image" />
-        <button className="special" onClick={() => setPopupActive(!popupActive)}>Add College</button>
+  <h1>College Candidates List</h1>
+  <div className="header-container">
+    <img src={myImage} alt="Description of Image" className="college-image" />
+    <div className="controls">
+      <button className="special" onClick={() => setPopupActive(!popupActive)}>Add College</button>
+      <div className="search-filters">
+        <div className="search-filter">
+          <input
+            type="text"
+            placeholder="Search by College Name..."
+            value={searchCollegeName}
+            onChange={handleSearchCollegeNameChange}
+          />
+        </div>
+        <div className="search-filter">
+          <input
+            type="text"
+            placeholder="Search by College Major..."
+            value={searchMajor}
+            onChange={handleSearchMajorChange}
+          />
+        </div>
       </div>
+    </div>
+  </div>
 
       <div className="colleges">
         {sortedColleges.map((college) => (
@@ -203,13 +249,13 @@ function App() {
                     onChange={e => handleReasonsToGo(e, i)}
                   />
                 ))}
-                <button type="button" className = "add-reason" onClick={handleReasonsToGoCount}>
+                <button type="button" className="add-reason" onClick={handleReasonsToGoCount}>
                   Add Reason
                 </button>
               </div>
 
               <div className="form-group">
-                <label> Why Us Essay</label>
+                <label>Why Us Essay</label>
                 <textarea
                   value={form.essay}
                   onChange={e => setForm({ ...form, essay: e.target.value })}
@@ -217,7 +263,7 @@ function App() {
               </div>
 
               <div className="buttons">
-              <button type="submit" className="submitButton">{editMode ? "Update" : "Submit"}</button>
+                <button type="submit" className="submitButton">{editMode ? "Update" : "Submit"}</button>
                 <button type="button" className="remove" onClick={() => setPopupActive(false)}>
                   Close
                 </button>
